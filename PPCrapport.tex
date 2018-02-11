@@ -4,10 +4,159 @@
 \usepackage{lmodern}
 \usepackage[a4paper]{geometry}
 \usepackage{babel}
-\begin{document}
-\title{Programmation par Contraintes}
-\author{Vasquez Alessandro}
-\maketitle
-\newpage
+\usepackage{enumitem}   
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{hyperref}
+\usepackage{algpseudocode}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\theoremstyle{definition}
+\newtheorem{deff}{D\'efinition}[section]
+\graphicspath{{./images/}}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
 
+
+\begin{document}
+	\title{Programmation par Contraintes - Rapport}
+	\author{Vasquez Alessandro}
+	\maketitle
+	\newpage
+	\tableofcontents
+	\newpage
+\section{Introduction}
+\label{sec:intro}
+\begin{figure*}[t!]
+	\centering
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{isographe.eps}
+		\caption{\label{fig:isographstar}Deux graphes isomorphes}
+	\end{subfigure}%
+	~ 
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{nonisographes.eps}
+		\caption{\label{fig:nonisograph}Graphes  non-isomorphes}
+	\end{subfigure}
+	\caption{Isomorphisme, examples}
+\end{figure*}
+
+Nous verrons d'abord les définitions des problème que nous traiterons dans la section \ref{sec:Développement}.
+\subsection{Isomorphisme de graphe}
+\begin{deff}
+Soient $G, H$ deux graphes $G=(V, E)$ et $H=(V', E')$. Une fonction $f$ entre $ F $ et $ G $ est un isomorphisme ssi $ f $ est une bijection entre les sommets de $ G $ et de $ H $ t.q. $ (u,v) \in E$ ssi $ (f(u), f(v)) \in H$.
+\end{deff}
+Nous remarquons qu'il y a plusieurs propriétés qui doivent être satisfaites:
+ \begin{enumerate}[label=(\roman*)]
+ 	\item $|V|=|V'|$,
+ 	\item $|E|=|E'|$,
+ 	\item $G, H$ ont le même nombre de composantes connectées.
+ \end{enumerate}
+Au début on peut penser que si tous les sommets des deux graphes ont le même dégrée, le graphe sont forcement isomorphes. 
+La figure \ref{fig:nonisograph} montre un exemple de graphes dont tous les sommets ont le même degré mais qui ne sont pas isomorphes.
+\subsection{Isomorphisme de sous-graphe}
+\begin{deff}
+Soient $G, H$ deux graphes $G=(V, E)$ et $H=(V', E')$. Nous nous demandons s'il existe un sous-graphe $ G'=(V_s, E_s), V_s \subseteq V \text{ et } E_s \subseteq E \cap (V \times V) \text{ tq } G' =_{iso} H. $
+\end{deff}
+\subsection{Plus grandes sous structures communes}
+
+
+\newpage
+\section{Développement}
+\label{sec:Développement}
+\subsection{Isomorphisme de graphe}
+\subsubsection{Modélisation}
+Soient $G=(V, E),\ G'=(V', E')$ deux graphes. 
+La définition d'isomorphisme nous permet d'obtenir directement une modélisation. Soit $CSP = (X, D, C)$ le problème de PPC que nous voulons définir. Nous définissons l'ensemble de variables de la façon suivante: 
+$$X=\{x_v\ |\ v \in V \},\ \forall v \in V.$$
+Puisque nous cherchons une fonction  $f: V \rightarrow V'$ t.q. $ (u,v) \in E$ ssi $ (f(u), f(v)) \in E'$, nous savons déjà que deux sommets $u \in V, u' \in V'$ peuvent être liés par $f$ uniquement si $deg(u) = deg(u')$. Donc, nous allons considérer pour chaque $u \in V$ l'ensemble des sommets $\{v_1, v_2..v_k\}$ tq $v_1, v_2..v_k \in V' \text{ et } deg(v_1)=deg(v_2)=..=deg(v_k)=deg(u), \text{ pour un certain } k: 0 \leq k \leq |V'|$. Nous remarquons tout de suite que si $k=0$ pour un sommet $u \in V$, il n'y aura pas une solution à notre problème. Pour chaque variable $x \in X,$ le domaine est ainsi définis comme l'ensemble: $$D_{x}=\{v\ |\ deg(v)=deg(x) \land v \in V'\}.$$
+Pour définir les contraintes, nous suivrons la définition d'isomorphisme, donc $\forall u, v \in V \text{ tq } (u,v) \in E:$
+$$C(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
+Ici les contraintes sont binaires et définies localement. Nous pouvons imaginer l'ensemble de contraintes locales ainsi définies comme un seul contrainte globale $C_g$. À ce propos, il est utile de préciser que une contrainte globale \it alldiff \rm peut être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $C(x_u, x_v)$.
+\subsubsection{Résolution}
+En considérant l'ensemble de contraintes locales comme une contrainte globale $C_g$, nous allons introduire maintenant le réseau des valeurs associé à $C_g$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
+$$U(C)=\bigcup_{x \in X(C)} D_x = V'.$$
+Nous savons aussi que $|X|=|V|,$ parce que une et une seule variable est associé à chaque sommet de $G$. Nous définissions le graphe bipartite $GV(C)=(X(C), U(C), A)$ où $A \subseteq X(C) \times U(C)$ est l'ensemble d'arêtes défini de la manière suivante:
+$$A=\{(x_v, u) \in A\ |\ x_v \in X(C), u \in U(C) \land deg(v)=deg(u) \},$$
+c'est à dire que dans le graphe $GV(C)$ il y aura un arc entre une variable $x_v$ et un sommet $u \in G'$ seulement si $v$ et $u$ ont le même degré. 
+En introduisant deux sommets $s \text{ et } t,$ un arc  de $s$ à $ u, \forall u \in U(C)$, un arc de $x$ à $t, \forall x \in X(C),$ un arc de $t$ à $s$ et en supposant que l'arc $ (x_v, u) $ est sortant de $u$ et entrant en $x_v$, nous pouvons construire le réseau de valeurs $N(C).$ Le problème de trouver un isomorphisme peut être transformé en un problème de flot sur $N(C)$ en définissant la fonction de capacité $c: A \rightarrow [\mathbb{R}, \mathbb{R}],$ où  $[\mathbb{R}, \mathbb{R}]$ est un intervalle fermé, i.e. le flot qui passe dans l'arc $a$ peut prendre une valeur dans cet intervalle, borne inférieure et supérieure comprises. Dans notre cas, la fonction de capacité $c$ est définie par
+\[  \forall (u,v) \in A:
+c((u,v))= 
+\begin{cases}
+[1,1]& \text{if } u=s \lor v=t,\\
+[0,1]              & \text{sinon}.
+\end{cases}
+\]
+Lorsque nous injections un flot de $s$ à $u \in U(C)$ et puis de $u$ à $x_v \in X(C)$ nous allons couper les arcs qui sont incompatible avec la contrainte globale où $u=x_v$ est fixé: par exemple, si un sommet $v' \in V$ est adjacent à $v$, mais $u' \in V'$ n'est pas adjacent à $u$, l'arc $(x_{v'},u')$ sera coupé. Nous allons itérer cette procédure jusqu'à nous trouvons une solution. Si pendant le processus un sommet perd tous ses arcs (i.e. son degré devient $0$), nous recommençons la procédure de zéro mais en choisissant au début un arc différent de $(u, x_v).$
+Un exemple de cette procédure de coupage des arcs est présenté dans la figure \ref{fig:algstar}. Nous remarquons que à chaque pas, des que un arc est choisi, il y a des arcs qui sont coupés pour au moins une des contraintes suivantes:
+\begin{enumerate}
+	\item le contrainte \it alldiff, \rm
+	\item le contrainte d'adjacence des sommets.
+\end{enumerate}
+
+
+
+\newpage
+\subsection{Isomorphisme de sous-graphe}
+Comme pour le premier problème, nous pouvons définir un $CSP=(X, D, C)$ tout de suite en utilisant la définition du problème d'isomorphisme de sous-graphe que nous avons introduit dans la section 
+\ref{sec:intro}. Soient $G=(V, E),\ G'=(V', E')$ deux graphes. Les variables et les domaines sont définies toujours de la manière suivante:
+$$X=\{x_v\ |\ v \in V \},\ \forall v \in V,$$
+$$D_{x}=\{v\ |\ deg(v)=deg(x) \land v \in V'\}.$$
+Comme avant, les contraintes peuvent être définies:
+$$C(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
+
+\begin{figure*}[t!]
+	
+	\centering
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{alg0.eps}
+		\caption{État initial}
+	\end{subfigure}%
+	~ 
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{alg1.eps}
+		\caption{$(x_a, a')$ choisi}
+	\end{subfigure}
+		\centering
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{alg2.eps}
+		\caption{$(x_c, b')$ choisi}
+	\end{subfigure}%
+	~ 
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+		\includegraphics[height=1.2in]{alg3.eps}
+		\caption{$(x_e, c')$ choisi}
+	\end{subfigure}
+\centering
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\includegraphics[height=1.2in]{alg4.eps}
+\caption{$(x_b, d')$ choisi}
+\end{subfigure}%
+~ 
+\begin{subfigure}[t]{0.5\textwidth}
+\centering
+\includegraphics[height=1.2in]{alg5.eps}
+\caption{$(x_d, e')$ choisi}
+\end{subfigure}
+\caption{\label{fig:algstar} Résolution pour l'exemple dans la figure \ref{fig:isographstar}.}
+\end{figure*}
+
+
+
+
+\newpage
+\section{Conclusion}
+
+
+\newpage
+\section{Bibliographie}
 \end{document}
