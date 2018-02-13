@@ -6,12 +6,15 @@
 \usepackage{babel}
 \usepackage{enumitem}   
 \usepackage{amssymb}
+\usepackage{verbatim}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{algorithm}
+\usepackage{algorithmicx}
 \usepackage{hyperref}
 \usepackage{algpseudocode}
 \usepackage{subcaption}
+\usepackage[numbers]{natbib}
 \usepackage{graphicx}
 \theoremstyle{definition}
 \newtheorem{deff}{D\'efinition}[section]
@@ -19,7 +22,8 @@
 \graphicspath{{./images/}}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
-
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \begin{document}
 	\title{Programmation par Contraintes - Rapport}
@@ -33,23 +37,30 @@
 \begin{figure*}[t!]
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
-		\includegraphics[height=1.2in]{isomorphismesimple.eps}
+		\includegraphics[height=1.5in]{isomorphismesimple.eps}
 		\caption{\label{fig:isographstar}Deux graphes isomorphes}
 	\end{subfigure}%
 	~ 
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
-		\includegraphics[height=1.2in]{nonisomorphegraphes.eps}
+		\includegraphics[height=1.8in]{nonisomorphegraphes.eps}
 		\caption{\label{fig:nonisograph}Graphes  non-isomorphes}
 	\end{subfigure}
 	\caption{Isomorphisme, examples}
 \end{figure*}
 
-Nous verrons d'abord les définitions des problème que nous traiterons dans la section \ref{sec:Développement}.
+Nous verrons d'abord les définitions préliminaires dans la section \ref{sec:intro}. Ensuite nous allons traiter les problème d'isomorphisme de graphe et sous-graphe dans la section \ref{sec:Développement}. 
+Enfin dans la section \ref{sec:conc} nous citerons des modèles différents proposés par différents auteur. 
+
+\begin{deff}[Graphe]
+	Un graphe $G$ est un couple $(V,E)$ où $V$ est l'ensemble de sommets et $E$ est l'ensemble d'arêtes. Une arête est une paire $(u,v)$ de sommets $u,v \in V \text{ tq } u \neq v.$
+	
+\end{deff}
+
 \begin{deff}[Isomorphisme de graphe]
 Soient $G, H$ deux graphes $G=(V, E)$ et $H=(V', E')$. Une fonction $f$ entre $ F $ et $ G $ est un isomorphisme ssi $ f $ est une bijection entre les sommets de $ G $ et de $ H $ t.q. $ (u,v) \in E$ ssi $ (f(u), f(v)) \in H$.
 \end{deff}
-Nous remarquons qu'il y a plusieurs propriétés qui doivent être satisfaites:
+Nous remarquons qu'il y a plusieurs propriétés qui doivent être satisfaites au même temps:
  \begin{enumerate}[label=(\roman*)]
  	\item $|V|=|V'|$,
  	\item $|E|=|E'|$,
@@ -61,15 +72,23 @@ La figure \ref{fig:nonisograph} montre un exemple de graphes dont tous les somme
 Soient $G, H$ deux graphes $G=(V, E)$ et $H=(V', E')$. Nous nous demandons s'il existe un sous-graphe $ G'=(V_s, E_s), V_s \subseteq V \text{ et } E_s \subseteq E \cap (V \times V) \text{ tq } G' =_{iso} H. $
 \end{deff}
 \begin{deff}[Plus grandes sous structures communes]
-	
+Entre les sous structures communes d'un graphe il y a différents types de sous-graphes sur lesquels nous pouvons tomber. Soit $G=(V,E)$ un graphe et $G'=(V',E')$ un sous-graphe de $G$. Alors:
+\begin{enumerate}
+	\item $G'$ est sous-graphe couvrant (ou \it graphe partiel \rm) de $G$ si $V=V',$
+	\item $G'$ est \it sous-graphe partiel \rm de $G$ si $V' \subseteq V \land \forall v,u \in V' : (u,v) \in E'  \text{ ssi } (u,v) \in E.$ 
+\end{enumerate}
+La sous-structure commune de deux graphe $G, H$ peut être définie comme un graphe $g$ tq il existe un isomorphisme de sous-graphe de $G$ à $g$ et de $H$ à $g$.
 \end{deff}
-
+\begin{rem}
+	Nous supposons que les isomorphisme sont définies sur graphes non orientés.
+\end{rem}
 
 \newpage
 \section{Développement}
 \label{sec:Développement}
 \subsection{Isomorphisme de graphe}
 \subsubsection{Modélisation}
+\label{sssec:model1}
 Soient $G=(V, E),\ G'=(V', E')$ deux graphes. 
 La définition d'isomorphisme nous permet d'obtenir directement une modélisation. Soit $CSP = (X, D, C)$ le problème de PPC que nous voulons définir. Nous définissons l'ensemble de variables de la façon suivante: 
 $$X=\{x_v\ |\ v \in V \},\ \forall v \in V.$$
@@ -81,8 +100,12 @@ $$C(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists 
 	\label{rem:contraintes}
 	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. L'ensemble de contraintes locales ainsi définies peut être imaginé comme un seul contrainte globale $C_g$. À ce propos, il est utile de préciser que une contrainte globale \it alldiff \rm peut être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $C(x_u, x_v)$.
 \end{rem}
+\subsubsection{Complexité du modèle}
+\label{subsubsec:compl1}
+La complexité du problème $CSP=(X,D,C)$ est donné par le nombre de variables, contraintes et par la taille des domaines. Pour ce problème nous avons que par construction $|X|=|V|$, c'est à dire que le nombre de variables est égal au nombre de sommets de $G$. Chaque domaine est défini comme un sous-ensemble de l'ensemble de sommets de $G'$, donc $|D_x| \leq |V'|, \forall x \in X.$ Puisque les contraintes sont définies comme l'ensemble $C \subseteq (V \times V'),$ le nombre de contraintes est toujours $|C| \leq |V| \cdot |V'|.$
+
 \subsubsection{Résolution}
-En considérant l'ensemble de contraintes locales comme une contrainte globale $C_g$, nous allons introduire maintenant le réseau des valeurs associé à $C_g$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
+En considérant l'ensemble de contraintes locales comme une contrainte globale $C_g$, nous allons introduire maintenant le réseau des valeurs \cite{regin} associé à $C_g$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
 $$U(C)=\bigcup_{x \in X(C)} D_x = V'.$$
 Nous savons aussi que $|X|=|V|,$ parce que une et une seule variable est associé à chaque sommet de $G$. Nous définissions le graphe bipartite $GV(C)=(X(C), U(C), A)$ où $A \subseteq X(C) \times U(C)$ est l'ensemble d'arêtes défini de la manière suivante:
 $$A=\{(u, x_v) \in A\ |\ u \in U(C), x_v \in X(C) \land deg(v)=deg(u) \},$$
@@ -103,12 +126,48 @@ c((u,v))=
 \end{cases}
 \]
 Lorsque nous injections un flot de $s$ à $u \in U(C)$ et puis de $u$ à $x_v \in X(C)$ nous allons couper les arcs qui sont incompatible avec la contrainte globale où $u=x_v$ est fixé: par exemple, si un sommet $v' \in V$ est adjacent à $v$, mais $u' \in V'$ n'est pas adjacent à $u$, l'arc $(x_{v'},u')$ sera coupé. Nous allons itérer cette procédure jusqu'à nous trouvions une solution. Si pendant le processus un sommet perd tous ses arcs (i.e. son degré devient $0$), nous recommençons la procédure de zéro mais en choisissant au début un arc différent de $(u, x_v).$
-Un exemple de cette procédure de résolution pour le cas de figure \ref{fig:isographstar} est présenté dans la figure \ref{fig:algstar} . Nous insistons sur le fait que à chaque pas, des que un arc est choisi, il y a des arcs qui sont coupés à cause au moins d'une des contraintes suivantes:
+Un exemple de cette procédure de résolution pour le cas de figure \ref{fig:isographstar} est présenté dans la figure \ref{fig:algstar} . Nous insistons sur le fait que à chaque pas, dès que un arc est choisi, il y a des arcs qui sont coupés à cause au moins d'une des contraintes suivantes:
 \begin{enumerate}
-	\item le contrainte \it alldiff, \rm
-	\item le contrainte d'adjacence des sommets.
+	\item les contraintes \it alldiff, \rm
+	\item les contraintes d'adjacence des sommets.
 \end{enumerate}
+Par exemple, dès que $(x_a, a')$ est fixé, nous coupons tous les autres arcs qui partent de $a'$ et ceux qui arrivent en $x_a$ pour la contrainte \it alldiff. \rm En suite pour les contraintes d'adjacence des sommets nous considérons que
+\begin{enumerate}
+	\item $neighbors(a)=\{c, d\},$
+	\item $neighbors(a')=\{b', e'\}.$
+\end{enumerate}
+Donc nous allons couper les arcs
 
+$$ a=(b', x_v) \text{ tq } v \notin \{c,d\} , $$
+$$ a=(e', x_v) \text{ tq } v \notin \{c,d\}, $$
+$$ a=(u, c) \text{ tq } u \notin \{b',e'\}, $$
+$$ a=(u, d) \text{ tq } u \notin \{b',e'\}. $$
+En suite nous allons itérer la procédure sur un autre sommets. 
+
+\subsubsection{Résolution, complexité}
+Sans compter l'initialisation des structures de données, l'algorithme de résolution va explorer tous les couple $(u, x_v), u \in U(C), x \in X(C)$ dans le pire des cas. Pour chaque couple nous allons chercher des arcs à couper en utilisant par exemple un algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
+Alors la complexité sera $$O(AC \cdot |U(C) \times X(C)|)=O(AC \cdot 2^{|V| \cdot |V'|}).$$
+C'est à dire que la complexité de l'algorithme est exponentielle, au pire.
+Par contre, nous savons que l'algorithme de résolution va se arrêter dés que une solution est trouvée. Il y a beaucoup d'exemple (comme dans la figure \ref{fig:algstar}) dans lesquels l'algorithme va trouver une solution en temps linéaire par rapport à l'ensemble des sommets.
+
+\begin{algorithm}
+	\caption{Résolution du réseau de valeurs}
+	\begin{algorithmic}[1]
+		\State $Q \gets U(C)$
+		\State $Q' \gets X(C)$
+		\While { $Q$ not empty }
+		\State $u \gets dequeue(Q)$
+		\State $x_v \gets dequeue(Q')$
+		\State $Sol \gets (u, x_v) $ 
+		\ForAll{$a \in A$}
+		\If { $a$ doesn't respect \it alldiff \rm or adjacency constraint}
+		\State delete $a$
+		\EndIf
+		\EndFor
+		\EndWhile
+	\end{algorithmic}
+\end{algorithm}
+%\cite{DBLP:books/daglib/0023376}
 
 \begin{figure*}[t!]
 	\begin{subfigure}[t]{0.5\textwidth}
@@ -120,31 +179,31 @@ Un exemple de cette procédure de résolution pour le cas de figure \ref{fig:iso
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.6in]{alg1.eps}
-		\caption{$(x_a, a')$ choisi}
+		\caption{$(a', x_a)$ choisi}
 	\end{subfigure}
 	
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.6in]{alg2.eps}
-		\caption{$(x_c, b')$ choisi}
+		\caption{$(b', x_c)$ choisi}
 	\end{subfigure}
 	~
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.6in]{alg3.eps}
-		\caption{$(x_e, c')$ choisi}
+		\caption{$(c', x_e)$ choisi}
 	\end{subfigure}
 	
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.6in]{alg4.eps}
-		\caption{$(x_b, d')$ choisi}
+		\caption{$(d', x_b)$ choisi}
 	\end{subfigure}
 	~
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.6in]{alg5.eps}
-		\caption{$(x_d, e')$ choisi}
+		\caption{$(e', x_d)$ choisi}
 	\end{subfigure}
 	\caption{\label{fig:algstar} Résolution pour l'exemple dans la figure \ref{fig:isographstar}.}
 \end{figure*}
@@ -163,7 +222,12 @@ Le degré de $v \in V$ doit être supérieur où égal au degré de $u \in V'$ p
 Comme avant, les contraintes peuvent être définies:
 $$C(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
 Les remarques \ref{rem:contraintes} s'appliquent toujours.
+
+\subsubsection{Complexité du modèle}
+Puisque nous avons défini la base du problème en utilisant la modélisation pour l'isomorphisme de graphe, les remarques sur la complexité dans le paragraphe \ref{subsubsec:compl1} s'appliquent toujours.
+
 \subsubsection{Résolution}
+\label{sssec:res}
 Afin de déterminer une solution nous pouvons reprendre la construction du réseau de valeurs du premier problème en appliquant quelques petites modifications. Supposons que le réseau $N(C)=(X(C), U(C), A)$ est défini comme avant. Maintenant nous allons définir une nouvelle fonction de capacité des arcs:
 \[  \forall (u,v) \in A:
 c((u,v))= 
@@ -180,6 +244,10 @@ Donc maintenant les arcs entrants de $t$ ont capacité: $[0,1]$. Dans le sens de
 \end{figure}
 Comme avant, un exemple de résolution pour le cas présenté dans la figure \ref{fig:isosubgraph} est indiqué à la figure \ref{fig:sousalgstar} .
 
+\subsubsection{Résolution, complexité}
+Comme avant, la complexité va toujours être 
+ $$O(AC \cdot |U(C) \times X(C)|)=O(AC \cdot 2^{|V| \cdot |V'|}),$$
+au pire. Par contre, de ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est que un grand nombre d'exemples peut être trouver pour montrer que ce algorithme arrive à trouver une solution en temps linéaire.
 
 
 \begin{figure*}[t!]
@@ -192,31 +260,49 @@ Comme avant, un exemple de résolution pour le cas présenté dans la figure \re
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.5in]{sousalg1.eps}
-		\caption{$(x_a, a')$ choisi}
+		\caption{$(a', x_a)$ choisi}
 	\end{subfigure}
 	
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.5in]{sousalg2.eps}
-		\caption{$(x_b, b')$ choisi}
+		\caption{$(b', x_b)$ choisi}
 	\end{subfigure}
 	~
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
 		\includegraphics[height=1.5in]{sousalg3.eps}
-		\caption{$(x_d, c')$ choisi}
+		\caption{$(c', x_d)$ choisi}
 	\end{subfigure}
 	
 	\caption{\label{fig:sousalgstar} Résolution pour l'exemple dans la figure \ref{fig:isosubgraph}.}
 \end{figure*}
 
 \newpage
-\subsubsection{Plus grandes sous structures communes}
+\subsection{Plus grandes sous structures communes}
+\subsubsection{Introduction}
+Grâce à la modélisation utilisée pour les problèmes de isomorphisme de graphe et sous-graphe, nous allons tout de suite arriver à une solution. Nous assumons que $CSP=(X,D,C)$ est le problème de programmation par contrainte défini comme dans \ref{sssec:model1} et que $N(C)$ est le réseau de valeurs défini comme dans \ref{sssec:res}.
+
+\subsubsection{Résolution}
+Une solution à ce problème peut être trouvée en itérant l'algorithme de résolution du réseau de valeurs et en essayant tous les cas et en gardant toutes les solutions admissibles dans un ensemble $S=\{S_0, S_1..\},$ où chaque $S_i$ est l'ensemble de couple $\{ (u_0, x_{v_0}), (u_1, x_{v_1}).. \}$. Enfin nous allons simplement choisir la solution qui correspond à l'isomorphisme de sous-graphe dont l'ensemble de sommets est le plus grand, c'est à dire:
+\[
+\argmax_{|S_i|} (S).
+\]
+
+\subsubsection{Résolution, complexité}
+Avec cet tactique de force brute, l'algorithme de résolution va explorer toujours tous les couple $(u, x_v), u \in U(C), x \in X(C)$. Comme avant, pour chaque couple nous allons utiliser l'algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
+Alors la complexité sera $$\Theta(AC \cdot |U(C) \times X(C)|).$$ 
+
+
 
 \newpage
 \section{Conclusion}
+\label{sec:conc}
+Nous avons présenté dans la section \ref{sec:Développement} trois simples modélisations et un algorithme de résolution qui utilise le réseau de valeurs pour trouver une solution. Malheureusement, la complexité de cet algorithme est exponentielle (dans le pire des cas) et, pour le problème du plus grande sous structure commune, elle est même exponentielle pour tout le cas. Tout à fait, ces problèmes sont encore ouverts, même s'il y a déjà nombreux articles qui proposent des nouveaux algorithmes et modélisations afin de réduire la complexité, par exemple \cite{SorlinS082010,SorlinS08, TakapouiB16}. Le problème c'est que il y a déjà beaucoup d'algorithmes qui arrivent à avoir une complexité quasi-polynomial pour un certain nombre d'exemples, mais il sont toujours exponentiels dans le pire des cas. Donc, le but maintenant c'est trouver un algorithme ou une modélisation tells que la complexité soit réduite pour tous les cas, c'est à dire garantir une complexité plus basse même dans le pire des cas.
+
 
 
 \newpage
-\section{Bibliographie}
+\bibliographystyle{plain}
+\bibliography{mybib}
 \end{document}
