@@ -95,17 +95,17 @@ $$X=\{x_v\ |\ v \in V \},\ \forall v \in V.$$
 Puisque nous cherchons une fonction  $f: V \rightarrow V'$ t.q. $ (u,v) \in E$ ssi $ (f(u), f(v)) \in E'$, nous savons déjà que deux sommets $u \in V, u' \in V'$ peuvent être liés par $f$ uniquement si $deg(u) = deg(u')$. Donc, nous allons considérer pour chaque $u \in V$ l'ensemble des sommets $\{v_1, v_2..v_k\}$ tq $v_1, v_2..v_k \in V' \text{ et } deg(v_1)=deg(v_2)=..=deg(v_k)=deg(u), \text{ pour un certain } k: 0 \leq k \leq |V'|$. Nous remarquons tout de suite que si $k=0$ pour un sommet $u \in V$, il n'y aura pas une solution à notre problème. Pour chaque variable $x \in X,$ le domaine est ainsi définis comme l'ensemble: 
 $$D_{x_v}=\{u\ |\ deg(u) = deg(v) \land u \in V'\}.$$
 Pour définir les contraintes, nous suivrons la définition d'isomorphisme, donc $\forall u, v \in V \text{ tq } (u,v) \in E:$
-$$C(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
+$$c(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
 \begin{rem}
 	\label{rem:contraintes}
-	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. L'ensemble de contraintes locales ainsi définies peut être imaginé comme un seul contrainte globale $C_g$. À ce propos, il est utile de préciser que une contrainte globale \it alldiff \rm peut être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $C(x_u, x_v)$.
+	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. L'ensemble de contraintes locales ainsi définies peut être imaginé comme un seul contrainte globale $C$. À ce propos, il est utile de préciser que une contrainte globale \it alldiff \rm peut être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $c(x_u, x_v)$.
 \end{rem}
 \subsubsection{Complexité du modèle}
 \label{subsubsec:compl1}
 La complexité du problème $CSP=(X,D,C)$ est donné par le nombre de variables, contraintes et par la taille des domaines. Pour ce problème nous avons que par construction $|X|=|V|$, c'est à dire que le nombre de variables est égal au nombre de sommets de $G$. Chaque domaine est défini comme un sous-ensemble de l'ensemble de sommets de $G'$, donc $|D_x| \leq |V'|, \forall x \in X.$ Puisque les contraintes sont définies comme l'ensemble $C \subseteq (V \times V'),$ le nombre de contraintes est toujours $|C| \leq |V| \cdot |V'|.$
 
 \subsubsection{Résolution}
-En considérant l'ensemble de contraintes locales comme une contrainte globale $C_g$, nous allons introduire maintenant le réseau des valeurs \cite{regin} associé à $C_g$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
+En considérant l'ensemble de contraintes locales comme une contrainte globale $C$, nous allons introduire maintenant le réseau des valeurs \cite{regin} associé à $C$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
 $$U(C)=\bigcup_{x \in X(C)} D_x = V'.$$
 Nous savons aussi que $|X|=|V|,$ parce que une et une seule variable est associé à chaque sommet de $G$. Nous définissions le graphe bipartite $GV(C)=(X(C), U(C), A)$ où $A \subseteq X(C) \times U(C)$ est l'ensemble d'arêtes défini de la manière suivante:
 $$A=\{(u, x_v) \in A\ |\ u \in U(C), x_v \in X(C) \land deg(v)=deg(u) \},$$
@@ -125,13 +125,14 @@ c((u,v))=
 [0,1]              & \text{sinon}.
 \end{cases}
 \]
-Lorsque nous injections un flot de $s$ à $u \in U(C)$ et puis de $u$ à $x_v \in X(C)$ nous allons couper les arcs qui sont incompatible avec la contrainte globale où $u=x_v$ est fixé: par exemple, si un sommet $v' \in V$ est adjacent à $v$, mais $u' \in V'$ n'est pas adjacent à $u$, l'arc $(x_{v'},u')$ sera coupé. Nous allons itérer cette procédure jusqu'à nous trouvions une solution. Si pendant le processus un sommet perd tous ses arcs (i.e. son degré devient $0$), nous recommençons la procédure de zéro mais en choisissant au début un arc différent de $(u, x_v).$
+L'idée c'est de trouver un flot tq l'arc $(t,q)$ est saturé. L'algorithme pour le trouver est décrit in \cite{regin}.
+Lorsque nous injections un flot de $s$ à $u \in U(C)$ et puis de $u$ à $x_v \in X(C)$ nous allons couper les arcs qui sont incompatible avec la contrainte globale où $u=x_v$ est fixé: par exemple, si un sommet $v' \in V$ est adjacent à $v$, mais $u' \in V'$ n'est pas adjacent à $u$, l'arc $(x_{v'},u')$ sera coupé. Ici un algorithme d'arc-consistance peut être utilisé. Ensuite nous allons itérer cette procédure jusqu'à nous trouvions une solution. Si pendant le processus un sommet perd tous ses arcs (i.e. son degré devient $0$), nous recommençons la procédure de zéro mais en choisissant au début un arc différent de $(u, x_v).$
 Un exemple de cette procédure de résolution pour le cas de figure \ref{fig:isographstar} est présenté dans la figure \ref{fig:algstar} . Nous insistons sur le fait que à chaque pas, dès que un arc est choisi, il y a des arcs qui sont coupés à cause au moins d'une des contraintes suivantes:
 \begin{enumerate}
 	\item les contraintes \it alldiff, \rm
 	\item les contraintes d'adjacence des sommets.
 \end{enumerate}
-Par exemple, dès que $(x_a, a')$ est fixé, nous coupons tous les autres arcs qui partent de $a'$ et ceux qui arrivent en $x_a$ pour la contrainte \it alldiff. \rm En suite pour les contraintes d'adjacence des sommets nous considérons que
+Par exemple, dès que un flot est injecté sur le chemin $s \rightarrow a' \rightarrow x_a \rightarrow t \rightarrow s$, nous coupons tous les autres arcs qui partent de $a'$ et ceux qui arrivent en $x_a$ pour la contrainte \it alldiff. \rm Ensuite pour les contraintes d'adjacence des sommets nous considérons que
 \begin{enumerate}
 	\item $neighbors(a)=\{c, d\},$
 	\item $neighbors(a')=\{b', e'\}.$
@@ -142,14 +143,14 @@ $$ a=(b', x_v) \text{ tq } v \notin \{c,d\} , $$
 $$ a=(e', x_v) \text{ tq } v \notin \{c,d\}, $$
 $$ a=(u, c) \text{ tq } u \notin \{b',e'\}, $$
 $$ a=(u, d) \text{ tq } u \notin \{b',e'\}. $$
-En suite nous allons itérer la procédure sur un autre sommets. 
+Ensuite nous allons itérer la procédure sur un autre sommets jusqu'à le flot qui entre dans $s$ est égal à $|U(C)|,$ i.e. tous les sommet de $G'$ sont couverts. 
 
 \subsubsection{Résolution, complexité}
-Sans compter l'initialisation des structures de données, l'algorithme de résolution va explorer tous les couple $(u, x_v), u \in U(C), x \in X(C)$ dans le pire des cas. Pour chaque couple nous allons chercher des arcs à couper en utilisant par exemple un algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
-Alors la complexité sera $$O(AC \cdot |U(C) \times X(C)|)=O(AC \cdot 2^{|V| \cdot |V'|}).$$
-C'est à dire que la complexité de l'algorithme est exponentielle, au pire.
-Par contre, nous savons que l'algorithme de résolution va se arrêter dés que une solution est trouvée. Il y a beaucoup d'exemple (comme dans la figure \ref{fig:algstar}) dans lesquels l'algorithme va trouver une solution en temps linéaire par rapport à l'ensemble des sommets.
-
+Sans compter l'initialisation des structures de données, l'algorithme de résolution va essayer d'injecter le flot pour toutes les permutations admissibles des couples $(u, x_v), u \in U(C), x \in X(C)$, dans le pire des cas. Chaque fois que le flot est injecté, nous allons chercher des arcs à couper en utilisant par exemple un algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
+Alors la complexité sera $$O(AC \cdot (|X(C)|^2 \cdot |U(C)|)).$$
+En fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis, la complexité de l'algorithme peut arriver à être exponentielle, au pire.
+Par contre, nous savons que l'algorithme de résolution va s'arrêter dés qu'une solution a été trouvée. Il y a beaucoup d'exemples (comme dans la figure \ref{fig:algstar}) dans lesquels l'algorithme va trouver une solution en temps polynomial par rapport à l'ensemble des sommets.
+\begin{comment}
 \begin{algorithm}
 	\caption{Résolution du réseau de valeurs}
 	\begin{algorithmic}[1]
@@ -167,6 +168,8 @@ Par contre, nous savons que l'algorithme de résolution va se arrêter dés que 
 		\EndWhile
 	\end{algorithmic}
 \end{algorithm}
+\end{comment}
+
 %\cite{DBLP:books/daglib/0023376}
 
 \begin{figure*}[t!]
@@ -236,7 +239,7 @@ c((u,v))=
 [0,1]              & \text{sinon}.
 \end{cases}
 \]
-Donc maintenant les arcs entrants de $t$ ont capacité: $[0,1]$. Dans le sens de la modélisation du problème, ça signifie que le but n'est plus d'essayer de couvrir entièrement les sommets des deux graphes, mais seulement ceux du deuxième graphe, c'est à dire $H$. De cette façon, dès que nous réussissons à couvrir tous les sommets $u \in U(C)$ avec le flot, nous allons trouver une solution. 
+Donc maintenant les arcs entrants de $t$ ont capacité: $[0,1]$. Dans le sens de la modélisation du problème, ça signifie que le but n'est plus d'essayer de couvrir entièrement les sommets des deux graphes, mais seulement ceux du deuxième graphe, c'est à dire $G'$. De cette façon, dès que nous réussissons à couvrir tous les sommets $u \in U(C)$ avec le flot, nous allons trouver une solution. 
 \begin{figure}[t]
 	\centering
 	\includegraphics[height=1.2in]{sousgrapheisomorphisme.eps}
@@ -246,8 +249,8 @@ Comme avant, un exemple de résolution pour le cas présenté dans la figure \re
 
 \subsubsection{Résolution, complexité}
 Comme avant, la complexité va toujours être 
- $$O(AC \cdot |U(C) \times X(C)|)=O(AC \cdot 2^{|V| \cdot |V'|}),$$
-au pire. Par contre, de ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est que un grand nombre d'exemples peut être trouver pour montrer que ce algorithme arrive à trouver une solution en temps linéaire.
+ $$O(AC \cdot (|X(C)|^2 \cdot |U(C)|)),$$
+avec une complexité exponentielle, toujours en fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis. Par contre, dans ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est que un grand nombre d'exemples peut être trouver pour montrer que ce algorithme arrive à trouver une solution en temps polynomial.
 
 
 \begin{figure*}[t!]
@@ -290,10 +293,7 @@ Une solution à ce problème peut être trouvée en itérant l'algorithme de ré
 \]
 
 \subsubsection{Résolution, complexité}
-Avec cet tactique de force brute, l'algorithme de résolution va explorer toujours tous les couple $(u, x_v), u \in U(C), x \in X(C)$. Comme avant, pour chaque couple nous allons utiliser l'algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
-Alors la complexité sera $$\Theta(AC \cdot |U(C) \times X(C)|).$$ 
-
-
+Avec cette tactique, l'algorithme de résolution va explorer toujours tous les possibles solutions, c'est sûr que la complexité sera exponentielle par rapport au nombre de sommets, peu importe quel algorithme d'arc-consistance ou structure de données sont utilisés. 
 
 \newpage
 \section{Conclusion}
