@@ -52,7 +52,7 @@
 Nous verrons d'abord les définitions préliminaires dans la section \ref{sec:intro}. Ensuite nous allons traiter les problème d'isomorphisme de graphe et sous-graphe dans la section \ref{sec:Développement}. 
 Enfin dans la section \ref{sec:conc} nous citerons des modèles différents proposés par différents auteur. 
 
-\begin{deff}[Graphe]
+\begin{deff}[Graphe sans Boucle]
 	Un graphe $G$ est un couple $(V,E)$ où $V$ est l'ensemble de sommets et $E$ est l'ensemble d'arêtes. Une arête est une paire $(u,v)$ de sommets $u,v \in V \text{ tq } u \neq v.$
 	
 \end{deff}
@@ -98,7 +98,8 @@ Pour définir les contraintes, nous suivrons la définition d'isomorphisme, donc
 $$c(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
 \begin{rem}
 	\label{rem:contraintes}
-	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. L'ensemble de contraintes locales ainsi définies peut être imaginé comme un seul contrainte globale $C$. À ce propos, il est utile de préciser que une contrainte globale \it alldiff \rm peut être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $c(x_u, x_v)$.
+	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. À partir de l'ensemble de contraintes locales il est possible de définir un seul contrainte de cardinalité globale $C$ \cite{regin}. Puisque nous cherchons une fonction isomorphe, nous savons que un sommet de $G$ doit être associé à chaque sommet de $G'$. Donc l'idée est d'avoir une contrainte globale dans lequel chaque valeur des domaines peut être assumée une et une seul fois par une variable.
+	Par ailleurs, il est utile de préciser que une contrainte globale \it alldiff \rm peut aussi être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $c(x_u, x_v)$.
 \end{rem}
 \subsubsection{Complexité du modèle}
 \label{subsubsec:compl1}
@@ -143,7 +144,7 @@ $$ a=(b', x_v) \text{ tq } v \notin \{c,d\} , $$
 $$ a=(e', x_v) \text{ tq } v \notin \{c,d\}, $$
 $$ a=(u, c) \text{ tq } u \notin \{b',e'\}, $$
 $$ a=(u, d) \text{ tq } u \notin \{b',e'\}. $$
-Ensuite nous allons itérer la procédure sur un autre sommets jusqu'à le flot qui entre dans $s$ est égal à $|U(C)|,$ i.e. tous les sommet de $G'$ sont couverts. 
+Ensuite nous allons itérer la procédure sur un autre sommets jusqu'à le flot qui entre dans $s$ est égal à $|U(C)|,$ i.e. tous les sommet de $G'$ sont couverts. Finalement, la procédure termine dès que le flot qui entre dans le sommet $s$ est égal au nombre de sommets de $G'$. S'il n'y a pas de solutions, la procédure termine quand toutes les possibles combinaisons ont été essayées.
 
 \subsubsection{Résolution, complexité}
 Sans compter l'initialisation des structures de données, l'algorithme de résolution va essayer d'injecter le flot pour toutes les permutations admissibles des couples $(u, x_v), u \in U(C), x \in X(C)$, dans le pire des cas. Chaque fois que le flot est injecté, nous allons chercher des arcs à couper en utilisant par exemple un algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
@@ -250,7 +251,7 @@ Comme avant, un exemple de résolution pour le cas présenté dans la figure \re
 \subsubsection{Résolution, complexité}
 Comme avant, la complexité va toujours être 
  $$O(AC \cdot (|X(C)|^2 \cdot |U(C)|)),$$
-avec une complexité exponentielle, toujours en fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis. Par contre, dans ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est que un grand nombre d'exemples peut être trouver pour montrer que ce algorithme arrive à trouver une solution en temps polynomial.
+avec une complexité potentiellement exponentielle, toujours en fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis. Par contre, dans ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est que un grand nombre d'exemples peut être trouver pour montrer que ce algorithme arrive à trouver une solution en temps polynomial.
 
 
 \begin{figure*}[t!]
@@ -287,7 +288,7 @@ avec une complexité exponentielle, toujours en fonction de quel algorithme d'ar
 Grâce à la modélisation utilisée pour les problèmes de isomorphisme de graphe et sous-graphe, nous allons tout de suite arriver à une solution. Nous assumons que $CSP=(X,D,C)$ est le problème de programmation par contrainte défini comme dans \ref{sssec:model1} et que $N(C)$ est le réseau de valeurs défini comme dans \ref{sssec:res}.
 
 \subsubsection{Résolution}
-Une solution à ce problème peut être trouvée en itérant l'algorithme de résolution du réseau de valeurs et en essayant tous les cas et en gardant toutes les solutions admissibles dans un ensemble $S=\{S_0, S_1..\},$ où chaque $S_i$ est l'ensemble de couple $\{ (u_0, x_{v_0}), (u_1, x_{v_1}).. \}$. Enfin nous allons simplement choisir la solution qui correspond à l'isomorphisme de sous-graphe dont l'ensemble de sommets est le plus grand, c'est à dire:
+Une solution à ce problème peut être trouvée en itérant l'algorithme de résolution du réseau de valeurs et en essayant tous les cas et en gardant toutes les solutions admissibles dans un ensemble $S=\{S_0, S_1..\},$ où chaque $S_i$ est une solution définie par l'ensemble de couple $\{ (u_0, x_{v_0}), (u_1, x_{v_1}).. \}$. Enfin nous allons simplement choisir la solution qui correspond à l'isomorphisme de sous-graphe dont l'ensemble de sommets est le plus grand, c'est à dire:
 \[
 \argmax_{|S_i|} (S).
 \]
@@ -298,7 +299,7 @@ Avec cette tactique, l'algorithme de résolution va explorer toujours tous les p
 \newpage
 \section{Conclusion}
 \label{sec:conc}
-Nous avons présenté dans la section \ref{sec:Développement} trois simples modélisations et un algorithme de résolution qui utilise le réseau de valeurs pour trouver une solution. Malheureusement, la complexité de cet algorithme est exponentielle (dans le pire des cas) et, pour le problème du plus grande sous structure commune, elle est même exponentielle pour tout le cas. Tout à fait, ces problèmes sont encore ouverts, même s'il y a déjà nombreux articles qui proposent des nouveaux algorithmes et modélisations afin de réduire la complexité, par exemple \cite{SorlinS082010,SorlinS08, TakapouiB16}. Le problème c'est que il y a déjà beaucoup d'algorithmes qui arrivent à avoir une complexité quasi-polynomial pour un certain nombre d'exemples, mais il sont toujours exponentiels dans le pire des cas. Donc, le but maintenant c'est trouver un algorithme ou une modélisation tells que la complexité soit réduite pour tous les cas, c'est à dire garantir une complexité plus basse même dans le pire des cas.
+Nous avons présenté dans la section \ref{sec:Développement} trois simples modélisations et un algorithme de résolution qui utilise le réseau de valeurs pour trouver une solution. Malheureusement, la complexité de cet algorithme est exponentielle (dans le pire des cas) et, pour le problème du plus grande sous structure commune, elle est même exponentielle pour tout le cas. Tout à fait, ces problèmes sont encore ouverts, même s'il y a déjà nombreux articles qui proposent des nouveaux algorithmes et modélisations afin de réduire la complexité, par exemple \cite{SorlinS082010,SorlinS08, TakapouiB16}. Le problème c'est que il y a déjà beaucoup d'algorithmes qui arrivent à avoir une complexité quasi-polynomial pour un certain nombre d'exemples, mais il sont toujours exponentiels dans le pire des cas. Donc, le but de la recherche sur ce sujet est de trouver un algorithme ou une modélisation tells que la complexité soit réduite pour tous les cas (au moins pour la plus part), c'est à dire garantir une complexité plus basse même dans le pire des cas.
 
 
 
