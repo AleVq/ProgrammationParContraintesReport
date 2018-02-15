@@ -48,9 +48,9 @@
 	\end{subfigure}
 	\caption{Isomorphisme, examples}
 \end{figure*}
-
-Nous verrons d'abord les définitions préliminaires dans la section \ref{sec:intro}. Ensuite nous allons traiter les problème d'isomorphisme de graphe et sous-graphe dans la section \ref{sec:Développement}. 
-Enfin dans la section \ref{sec:conc} nous citerons des modèles différents proposés par différents auteur. 
+Dans ce rapport nous allons proposer une modélisation pour trois problèmes d'isomorphisme sur graphe. 
+Nous verrons d'abord les définitions préliminaires dans la section \ref{sec:intro}. Ensuite nous allons traiter les problèmes d'isomorphisme de graphe, sous-graphe et plus grandes sous structures communes dans la section \ref{sec:Développement}. 
+Enfin dans la section \ref{sec:conc} nous citerons quelques articles qui proposent des modélisations différents. 
 
 \begin{deff}[Graphe sans Boucle]
 	Un graphe $G$ est un couple $(V,E)$ où $V$ est l'ensemble de sommets et $E$ est l'ensemble d'arêtes. Une arête est une paire $(u,v)$ de sommets $u,v \in V \text{ tq } u \neq v.$
@@ -80,7 +80,7 @@ Entre les sous structures communes d'un graphe il y a différents types de sous-
 La sous-structure commune de deux graphe $G, H$ peut être définie comme un graphe $g$ tq il existe un isomorphisme de sous-graphe de $G$ à $g$ et de $H$ à $g$.
 \end{deff}
 \begin{rem}
-	Nous supposons que les isomorphisme sont définies sur graphes non orientés.
+	Nous supposons que les isomorphismes sont définies sur graphes non orientés.
 \end{rem}
 
 \newpage
@@ -98,7 +98,7 @@ Pour définir les contraintes, nous suivrons la définition d'isomorphisme, donc
 $$c(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
 \begin{rem}
 	\label{rem:contraintes}
-	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. À partir de l'ensemble de contraintes locales il est possible de définir un seul contrainte de cardinalité globale $C$ \cite{regin}. Puisque nous cherchons une fonction isomorphe, nous savons que un sommet de $G$ doit être associé à chaque sommet de $G'$. Donc l'idée est d'avoir une contrainte globale dans lequel chaque valeur des domaines peut être assumée une et une seul fois par une variable.
+	Nous allons appeler ce type de contrainte \it contrainte d'adjacence des sommets\rm. Ici les contraintes sont binaires et définies localement. À partir de l'ensemble de contraintes locales il est possible de définir un seul contrainte de cardinalité globale $C$ \cite{regin}. Puisque nous cherchons une fonction isomorphe, nous savons que un sommet de $G$ doit être associé à chaque sommet de $G'$. Donc l'idée est d'avoir une contrainte globale dans lequel chaque valeur des domaines peut être assumée une et une seul fois par une variable. Nous pouvons par exemple utiliser le système d'étiquetage proposé dans \cite{contrainteglobale}.
 	Par ailleurs, il est utile de préciser que une contrainte globale \it alldiff \rm peut aussi être utilisé une fois pour toute plutôt que indiquer $u' \neq v'$ pour chaque contrainte $c(x_u, x_v)$.
 \end{rem}
 \subsubsection{Complexité du modèle}
@@ -106,7 +106,7 @@ $$c(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists 
 La complexité du problème $CSP=(X,D,C)$ est donné par le nombre de variables, contraintes et par la taille des domaines. Pour ce problème nous avons que par construction $|X|=|V|$, c'est à dire que le nombre de variables est égal au nombre de sommets de $G$. Chaque domaine est défini comme un sous-ensemble de l'ensemble de sommets de $G'$, donc $|D_x| \leq |V'|, \forall x \in X.$ Puisque les contraintes sont définies comme l'ensemble $C \subseteq (V \times V'),$ le nombre de contraintes est toujours $|C| \leq |V| \cdot |V'|.$
 
 \subsubsection{Résolution}
-En considérant l'ensemble de contraintes locales comme une contrainte globale $C$, nous allons introduire maintenant le réseau des valeurs \cite{regin} associé à $C$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
+En considérant le contrainte globale $C$ obtenu à partir de l'ensemble de contraintes globales, nous allons introduire maintenant le réseau de valeurs \cite{regin} associé à $C$. Puisque $\forall x \in X: D_x \subseteq V'$ nous savons que
 $$U(C)=\bigcup_{x \in X(C)} D_x = V'.$$
 Nous savons aussi que $|X|=|V|,$ parce que une et une seule variable est associé à chaque sommet de $G$. Nous définissions le graphe bipartite $GV(C)=(X(C), U(C), A)$ où $A \subseteq X(C) \times U(C)$ est l'ensemble d'arêtes défini de la manière suivante:
 $$A=\{(u, x_v) \in A\ |\ u \in U(C), x_v \in X(C) \land deg(v)=deg(u) \},$$
@@ -118,7 +118,7 @@ Pour construire le réseau de valeurs $N(C),$ nous devons introduire des nouveau
 	\item un arc $(x_v, t)$ pour chaque $x_v \in X(C),$
 	\item une direction pour chaque arc $a=(u,v) \in A$: nous supposons que $a$ est sortant de $u$ et entrant dans $v$.
 \end{enumerate}
- Le problème de trouver un isomorphisme peut être transformé en un problème de flot sur $N(C)$ en définissant la fonction de capacité $c: A \rightarrow [\mathbb{R}, \mathbb{R}],$ où  $[\mathbb{R}, \mathbb{R}]$ est un intervalle fermé dans lequel le flot qui passe dans l'arc $a$ peut prendre une valeur, borne inférieure et supérieure comprises. Dans notre cas, la fonction de capacité $c$ est définie par
+ Le problème de trouver un isomorphisme peut être transformé en un problème de flot sur $N(C)$ en définissant la fonction de capacité $c: A \rightarrow [\mathbb{R}, \mathbb{R}],$ où  $[\mathbb{R}, \mathbb{R}]$ est un intervalle fermé dans lequel le flot qui passe dans l'arc $a$ peut prendre une valeur, comprise la borne inférieure et supérieure. Dans notre cas, la fonction de capacité $c$ est définie par
 \[  \forall (u,v) \in A:
 c((u,v))= 
 \begin{cases}
@@ -126,7 +126,7 @@ c((u,v))=
 [0,1]              & \text{sinon}.
 \end{cases}
 \]
-L'idée c'est de trouver un flot tq l'arc $(t,q)$ est saturé. L'algorithme pour le trouver est décrit in \cite{regin}.
+L'idée est de trouver un flot tq l'arc $(t,q)$ est saturé. L'algorithme pour le trouver est décrit in \cite{regin}.
 Lorsque nous injections un flot de $s$ à $u \in U(C)$ et puis de $u$ à $x_v \in X(C)$ nous allons couper les arcs qui sont incompatible avec la contrainte globale où $u=x_v$ est fixé: par exemple, si un sommet $v' \in V$ est adjacent à $v$, mais $u' \in V'$ n'est pas adjacent à $u$, l'arc $(x_{v'},u')$ sera coupé. Ici un algorithme d'arc-consistance peut être utilisé. Ensuite nous allons itérer cette procédure jusqu'à nous trouvions une solution. Si pendant le processus un sommet perd tous ses arcs (i.e. son degré devient $0$), nous recommençons la procédure de zéro mais en choisissant au début un arc différent de $(u, x_v).$
 Un exemple de cette procédure de résolution pour le cas de figure \ref{fig:isographstar} est présenté dans la figure \ref{fig:algstar} . Nous insistons sur le fait que à chaque pas, dès que un arc est choisi, il y a des arcs qui sont coupés à cause au moins d'une des contraintes suivantes:
 \begin{enumerate}
@@ -144,13 +144,13 @@ $$ a=(b', x_v) \text{ tq } v \notin \{c,d\} , $$
 $$ a=(e', x_v) \text{ tq } v \notin \{c,d\}, $$
 $$ a=(u, c) \text{ tq } u \notin \{b',e'\}, $$
 $$ a=(u, d) \text{ tq } u \notin \{b',e'\}. $$
-Ensuite nous allons itérer la procédure sur un autre sommets jusqu'à le flot qui entre dans $s$ est égal à $|U(C)|,$ i.e. tous les sommet de $G'$ sont couverts. Finalement, la procédure termine dès que le flot qui entre dans le sommet $s$ est égal au nombre de sommets de $G'$. S'il n'y a pas de solutions, la procédure termine quand toutes les possibles combinaisons ont été essayées.
+Ensuite nous allons itérer la procédure sur un autre sommets jusqu'à le flot qui entre dans $s$ est égal à $|U(C)|,$ i.e. tous les sommets de $G'$ sont couverts. Finalement, la procédure termine dès que le flot qui entre dans le sommet $s$ est égal au nombre de sommets de $G'$. S'il n'y a pas de solutions, la procédure termine quand toutes les possibles combinaisons ont été essayées.
 
 \subsubsection{Résolution, complexité}
 Sans compter l'initialisation des structures de données, l'algorithme de résolution va essayer d'injecter le flot pour toutes les permutations admissibles des couples $(u, x_v), u \in U(C), x \in X(C)$, dans le pire des cas. Chaque fois que le flot est injecté, nous allons chercher des arcs à couper en utilisant par exemple un algorithme d'arc-consistance. Supposons que $AC$ est la complexité de l'algorithme d'arc-consistance.  
 Alors la complexité sera $$O(AC \cdot (|X(C)|^2 \cdot |U(C)|)).$$
 En fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis, la complexité de l'algorithme peut arriver à être exponentielle, au pire.
-Par contre, nous savons que l'algorithme de résolution va s'arrêter dés qu'une solution a été trouvée. Il y a beaucoup d'exemples (comme dans la figure \ref{fig:algstar}) dans lesquels l'algorithme va trouver une solution en temps polynomial par rapport à l'ensemble des sommets.
+Par contre, nous savons que l'algorithme de résolution va s'arrêter dés qu'une solution a été trouvée. Il y a beaucoup d'exemples (comme dans la figure \ref{fig:algstar}) dans lesquels l'algorithme va trouver une solution en temps polynomial par rapport à l'ensemble de sommets.
 \begin{comment}
 \begin{algorithm}
 	\caption{Résolution du réseau de valeurs}
@@ -223,8 +223,8 @@ Comme pour le premier problème, nous pouvons définir un $CSP=(X, D, C)$ tout d
 $$X=\{x_v\ |\ v \in V \},\ \forall v \in V,$$
 $$D_{x_v}=\{u\ |\ deg(u) \leq deg(v) \land u \in V'\}.$$
 Le degré de $v \in V$ doit être supérieur où égal au degré de $u \in V'$ parce que nous cherchons un sous-graphe de $G$ qui soit isomorphe à $G'$, donc si nous choisissons une couple $(x_v, u)$ où $deg(u) < deg(v),$ nous pouvons toujours supprimer $deg(v) - deg(u)$ arcs adjacent à $v$ pour obtenir un sous-graphe tq $deg(u) = deg(v).$
-Comme avant, les contraintes peuvent être définies:
-$$C(x_u, x_v) \triangleq \text{ " pour chaque sommets } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
+Comme avant, les contraintes peuvent être définies $\forall u, v \in V \text{ tq } (u,v) \in E:$:
+$$C(x_u, x_v) \triangleq \text{ " pour chaque sommet } u' \in D_{x_u}: \exists v' \in D_{x_v} \text{ tq } (u', v') \in E' \land u' \neq v' \text{ "}.$$
 Les remarques \ref{rem:contraintes} s'appliquent toujours.
 
 \subsubsection{Complexité du modèle}
@@ -232,7 +232,7 @@ Puisque nous avons défini la base du problème en utilisant la modélisation po
 
 \subsubsection{Résolution}
 \label{sssec:res}
-Afin de déterminer une solution nous pouvons reprendre la construction du réseau de valeurs du premier problème en appliquant quelques petites modifications. Supposons que le réseau $N(C)=(X(C), U(C), A)$ est défini comme avant. Maintenant nous allons définir une nouvelle fonction de capacité des arcs:
+Afin de déterminer une solution nous pouvons reprendre la construction du réseau de valeurs du premier problème en appliquant quelque petite modification. Supposons que le réseau $N(C)=(X(C), U(C), A)$ est défini comme avant. Maintenant nous allons définir une nouvelle fonction de capacité des arcs:
 \[  \forall (u,v) \in A:
 c((u,v))= 
 \begin{cases}
@@ -251,7 +251,7 @@ Comme avant, un exemple de résolution pour le cas présenté dans la figure \re
 \subsubsection{Résolution, complexité}
 Comme avant, la complexité va toujours être 
  $$O(AC \cdot (|X(C)|^2 \cdot |U(C)|)),$$
-avec une complexité potentiellement exponentielle, toujours en fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis. Par contre, dans ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est que un grand nombre d'exemples peut être trouver pour montrer que ce algorithme arrive à trouver une solution en temps polynomial.
+avec une complexité potentiellement exponentielle, toujours en fonction de quel algorithme d'arc-consistance et quel structure de données ont été choisis. Par contre, dans ce cas, puisque nous allons nous arrêter dès que nous trouvons un sous-graphe de $G$ pour lequel il y a une solution, l'algorithme de résolution peut être plus vite de l'algorithme pour l'isomorphisme simple. De toute façon l'idée c'est qu'il y a un bon nombre d'exemples pour lesquels cet algorithme arrive à trouver une solution en temps polynomial.
 
 
 \begin{figure*}[t!]
@@ -299,7 +299,7 @@ Avec cette tactique, l'algorithme de résolution va explorer toujours tous les p
 \newpage
 \section{Conclusion}
 \label{sec:conc}
-Nous avons présenté dans la section \ref{sec:Développement} trois simples modélisations et un algorithme de résolution qui utilise le réseau de valeurs pour trouver une solution. Malheureusement, la complexité de cet algorithme est exponentielle (dans le pire des cas) et, pour le problème du plus grande sous structure commune, elle est même exponentielle pour tout le cas. Tout à fait, ces problèmes sont encore ouverts, même s'il y a déjà nombreux articles qui proposent des nouveaux algorithmes et modélisations afin de réduire la complexité, par exemple \cite{SorlinS082010,SorlinS08, TakapouiB16}. Le problème c'est que il y a déjà beaucoup d'algorithmes qui arrivent à avoir une complexité quasi-polynomial pour un certain nombre d'exemples, mais il sont toujours exponentiels dans le pire des cas. Donc, le but de la recherche sur ce sujet est de trouver un algorithme ou une modélisation tells que la complexité soit réduite pour tous les cas (au moins pour la plus part), c'est à dire garantir une complexité plus basse même dans le pire des cas.
+Nous avons présenté dans la section \ref{sec:Développement} trois simples modélisations et un algorithme de résolution qui utilise le réseau de valeurs pour trouver une solution. Malheureusement, la complexité de cet algorithme est exponentielle (dans le pire des cas) et, pour le problème du plus grande sous structure commune, elle est même exponentielle pour tout le cas. Tout à fait, ces problèmes sont encore ouverts, même s'il y a déjà nombreux articles qui proposent des nouveaux algorithmes et modélisations afin de réduire la complexité, par exemple \cite{SorlinS082010,SorlinS08, TakapouiB16}. Le problème c'est que il y a déjà beaucoup d'algorithmes qui arrivent à avoir une complexité polynomial pour un certain nombre d'exemples, mais il sont toujours exponentiels dans le pire des cas. Donc, le but de la recherche sur ce sujet est de trouver un algorithme ou une modélisation tells que la complexité soit réduite pour tous les cas (ou pour la plus part, au moins), c'est à dire garantir une complexité plus basse même dans le pire des cas.
 
 
 
